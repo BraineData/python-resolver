@@ -1,0 +1,10 @@
+*.jsonl
+*.csv
+*.png
+*.gz
+**/target/**
+*.so
+*.d
+*.egg-info/**
+__*
+!**/__init__.py
