@@ -1,0 +1,18 @@
+[build-system]
+# Use 'setuptools' or 'hatchling' as the backend
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "job_resolver"
+version = "0.1.0"
+description = "A simple example package"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = ["msgspec"]
+
+[tool.setuptools.packages.find]
+where = ["src"]
+
+[project.scripts]
+spawn_resolver = "job_resolver.core_worker:main"
