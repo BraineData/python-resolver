@@ -45,7 +45,7 @@ class Failed:
 @dataclass(slots=True)
 class SubdagResult:
     index: SubdagIndex
-    tags: list[str] = field(default_factory=list)
+    tags: list[tuple[str, str]] = field(default_factory=list)
 
 
 type StepResultType[Result, RunInfo] = Result | SubdagResult | NewRun[RunInfo] | ExistingRun[RunInfo] | Failed

@@ -139,7 +139,7 @@ class WireSubdagTaskSpec[TaskSpec](Struct):
 class Subdag[TaskSpec](Struct):
     task_specs: list[WireSubdagTaskSpec[TaskSpec]]
     output_node: SubdagIndex
-    tags: list[str]
+    tags: list[tuple[str, str]]
 
 
 class NewRun[RunInfo](Struct):
