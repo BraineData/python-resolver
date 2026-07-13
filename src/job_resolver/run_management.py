@@ -29,19 +29,18 @@ def search_runs(
     match_params: bool = True,
     match_env: bool = False,
     only_success: bool = True,
-    min_run_start: datetime.datetime | None = None,
-    max_run_start: datetime.datetime | None = None,
+    run_start_interval: tuple[datetime.datetime | None, datetime.datetime | None] = (None, None),
 ):
 
     conditions = []
     values = []
 
-    if min_run_start:
-        min_as_int = int(min_run_start.timestamp() * 10**6) + min_run_start.microsecond
+    if run_start_interval[0]:
+        min_as_int = int(run_start_interval[0].timestamp() * 10**6) + run_start_interval[0].microsecond
         conditions.append("run_data ->> '$.start_us' >= ?")
         values.append(min_as_int)
-    if max_run_start:
-        max_as_int = int(max_run_start.timestamp() * 10**6) + max_run_start.microsecond
+    if run_start_interval[1]:
+        max_as_int = int(run_start_interval[1].timestamp() * 10**6) + run_start_interval[1].microsecond
         conditions.append("run_data ->> '$.start_us' <= ?")
         values.append(max_as_int)
     if match_cmd:
@@ -87,14 +86,11 @@ def try_reuse(
     match_params: bool = True,
     match_env: bool = False,
     only_success: bool = True,
-    min_run_start: datetime.datetime | None = None,
-    max_run_start: datetime.datetime | None = None,
+    run_start_interval: tuple[datetime.datetime | None, datetime.datetime | None] = (None, None),
     no_reuse: bool = False,
 ):
     if not no_reuse:
-        available = search_runs(
-            spec, match_cmd=match_cmd, match_env=match_env, match_params=match_params, only_success=only_success, min_run_start=min_run_start, max_run_start=max_run_start
-        )
+        available = search_runs(spec, match_cmd=match_cmd, match_env=match_env, match_params=match_params, only_success=only_success, run_start_interval=run_start_interval)
         if available:
             return ExistingRun(available[-1][0], rai)
     return NewRun(
