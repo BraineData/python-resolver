@@ -4,13 +4,19 @@ from typing import Any
 import msgspec
 
 from .core_worker import ENCODER
-from .wire_format import RUN_DB_PATH, ExistingRun, NewRun, WorkerRunData, WorkerRunSpec
+from .wire_format import RUN_DB_PATH, ExistingRun, NewRun, WorkerRunSpec
 
 try:
     conn = sqlite3.connect(f"file:{RUN_DB_PATH}?mode=ro", uri=True)
 except Exception as e:
     e.add_note(f"file:{RUN_DB_PATH}?mode=ro")
     raise
+
+
+class SavedRunData(msgspec.Struct):
+    base_location: str
+    inner_cwd: str
+    exit_code: int
 
 
 def search_runs(
@@ -56,7 +62,7 @@ def search_runs(
 
     rows = conn.execute(query, values).fetchall()
 
-    return [(row[0], msgspec.json.decode(row[1], type=WorkerRunSpec), msgspec.json.decode(row[2], type=WorkerRunData)) for row in rows]
+    return [(row[0], msgspec.json.decode(row[1], type=WorkerRunSpec), msgspec.json.decode(row[2], type=SavedRunData)) for row in rows]
 
 
 def try_reuse(spec: WorkerRunSpec, rai: Any, *, match_cmd: bool = True, match_params: bool = True, match_env: bool = False, only_success: bool = True, no_reuse: bool = False):

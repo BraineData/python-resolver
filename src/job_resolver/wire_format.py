@@ -87,14 +87,10 @@ class RunJob[RunInfo](Struct, tag="run_job"):
     info: RunInfo
     data: WorkerRunData
 
-    def as_path(self, item: str | None = None) -> Path:
-        if item is None:
-            return Path(os.environ[self.data.base_location]) / self.data.inner_cwd
+    def as_path(self, item: str) -> Path:
         return Path(os.environ[self.data.base_location]) / self.data.inner_cwd / self.info[item]  # pyright: ignore[reportIndexIssue]
 
-    def as_location(self, item: str | None = None) -> Location:
-        if item is None:
-            return Location(self.data.base_location, Path(self.data.inner_cwd))
+    def as_location(self, item: str) -> Location:
         return Location(self.data.base_location, Path(self.data.inner_cwd) / self.info[item])  # pyright: ignore[reportIndexIssue]
 
 
