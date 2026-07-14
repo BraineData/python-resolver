@@ -30,6 +30,7 @@ def search_runs(
     match_env: bool = False,
     only_success: bool = True,
     run_start_interval: tuple[datetime.datetime | None, datetime.datetime | None] = (None, None),
+    max_n: int | None = None,
 ):
 
     conditions = []
@@ -37,16 +38,15 @@ def search_runs(
 
     if run_start_interval[0]:
         min_as_int = int(run_start_interval[0].timestamp() * 10**6) + run_start_interval[0].microsecond
-        conditions.append("run_data ->> '$.start_us' >= ?")
+        conditions.append("CAST(run_data ->> '$.start_us' AS INT) >= ?")
         values.append(min_as_int)
     if run_start_interval[1]:
         max_as_int = int(run_start_interval[1].timestamp() * 10**6) + run_start_interval[1].microsecond
-        conditions.append("run_data ->> '$.start_us' <= ?")
+        conditions.append("CAST(run_data ->> '$.start_us' AS INT) <= ?")
         values.append(max_as_int)
     if match_cmd:
         conditions.append("cmd ->> '$.program' = ?")
         values.append(w.program)
-
         conditions.append("cmd -> '$.args' = json(?)")
         values.append(ENCODER.encode(w.args))
 
@@ -61,17 +61,23 @@ def search_runs(
     if only_success:
         conditions.append("run_data ->> '$.exit_code' = ?")
         values.append(0)
+
+    limit_str = f"LIMIT {max_n}" if max_n is not None else ""
     if conditions:
         query = f"""
             SELECT prid, cmd, run_data
             FROM runs
             WHERE {" AND ".join(conditions)}
+            ORDER BY CAST(run_data ->> '$.start_us' AS INT) DESC
+            {limit_str}
         """  # noqa: S608
     else:
-        query = """
+        query = f"""
             SELECT prid, cmd, run_data
             FROM runs
-            """
+            ORDER BY CAST(run_data ->> '$.start_us' AS INT) DESC
+            {limit_str}
+            """  # noqa: S608
 
     rows = conn.execute(query, values).fetchall()
 
