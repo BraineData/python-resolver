@@ -96,7 +96,9 @@ def try_reuse(
     no_reuse: bool = False,
 ):
     if not no_reuse:
-        available = search_runs(spec, match_cmd=match_cmd, match_env=match_env, match_params=match_params, only_success=only_success, run_start_interval=run_start_interval)
+        available = search_runs(
+            spec, match_cmd=match_cmd, match_env=match_env, match_params=match_params, only_success=only_success, run_start_interval=run_start_interval, max_n=1
+        )
         if available:
             return ExistingRun(available[-1][0], rai)
     return NewRun(
