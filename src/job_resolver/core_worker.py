@@ -64,10 +64,17 @@ def main() -> None:
     send_message(sock, Initialized())
     decoder = msgspec.json.Decoder(type=Submit[handler.TS, handler.R, handler.RAI])
 
+    buffer = b""
     while True:
         chunk = sock.recv(4096)
         if not chunk:
             break
+        buffer += chunk
+        *lines, buffer = buffer.split(b"\n")
+        for line in lines:
+            if not line.strip():
+                continue
+            job = decoder.decode(line)
         parsed_batch = decoder.decode_lines(chunk)
         if len(parsed_batch) == 1:
             job = parsed_batch[0]
