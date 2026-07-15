@@ -71,11 +71,11 @@ def main() -> None:
             break
         buffer += chunk
         *lines, buffer = buffer.split(b"\n")
+        parsed_batch = []
         for line in lines:
             if not line.strip():
                 continue
-            job = decoder.decode(line)
-        parsed_batch = decoder.decode_lines(chunk)
+            parsed_batch.append(decoder.decode(line))
         if len(parsed_batch) == 1:
             job = parsed_batch[0]
         elif len(parsed_batch) == 0:
