@@ -75,7 +75,11 @@ def main() -> None:
         for line in lines:
             if not line.strip():
                 continue
-            parsed_batch.append(decoder.decode(line))
+            try:
+                parsed_batch.append(decoder.decode(line))
+            except Exception as e:
+                e.add_note(f"While decoding line\n{line}")
+                raise
         if len(parsed_batch) == 1:
             job = parsed_batch[0]
         elif len(parsed_batch) == 0:
