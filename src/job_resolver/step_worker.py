@@ -196,7 +196,7 @@ class Step:
         return Step(self._propagate_fail, values, self._unwrap, self._as_kwargs, self._no_deps)
 
     def allows_fail_deps(self):
-        return Step(False, self._accepts, self._unwrap, self._as_kwargs, self._no_deps)
+        return Step(False, (*self._accepts, "failed"), self._unwrap, self._as_kwargs, self._no_deps)
 
     def ensure_unwrapped(self):
         return Step(self._propagate_fail, self._accepts, True, self._as_kwargs, self._no_deps)
